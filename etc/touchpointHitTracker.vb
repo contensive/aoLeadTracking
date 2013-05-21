@@ -4,7 +4,7 @@ function touchpointHit
 	dim token
 	dim logName,logData
 	dim cs
-	dim userId,tokenId,isBot,touchUser,sql
+	dim userId,leadSourceId,isBot,touchUser,sql
 	dim returnHtml
 	'
 	returnHtml = ""
@@ -13,11 +13,11 @@ function touchpointHit
 		logData = vbcrlf & now() & vbtab & userId & vbtab & "touchpointHit:" & token
 		logData = logData & vbtab & "testing[" & testing & "]"
 		set cs = cp.csNew()
-		if cs.open( "tracking tokens", "token=" & cp.db.encodeSqlText( token )) then
-			tokenId = cs.getInteger( "id" )
+		if cs.open( "Lead Sources", "token=" & cp.db.encodeSqlText( token )) then
+			leadSourceId = cs.getInteger( "id" )
 		end if
 		call cs.close()
-		if ( tokenId<>0 ) then
+		if ( leadSourceId<>0 ) then
 			if instr( 1, cp.request.remoteIp, "173.167.49." )<>0 then
 				logData = logData & ",skipping-ContensiveIP[" & cp.request.remoteIp & "]"
 			else
@@ -45,7 +45,7 @@ function touchpointHit
 						& "(id=" & userId & ")" _
 						& "and((admin=0)or(admin is null))" _
 						& "and((developer=0)or(developer is null))" _
-						& "and((trackingTokenId=0)or(trackingTokenId is null))" _
+						& "and((initialLeadSourceId=0)or(initialLeadSourceId is null))" _
 						& "and((ExcludeFromAnalytics=0)or(ExcludeFromAnalytics is null))"
 				end if
 				if cs.open( "people", sql ) then
@@ -59,7 +59,7 @@ function touchpointHit
 				end if
 			end if
 		end if
-		logName = "touchpointTracking\eventLog" & cStr( int( cDbl( now ))) & ".txt"
+		logName = "leadTracking\eventLog" & cStr( int( cDbl( now ))) & ".txt"
 		call cp.file.appendVirtual( logname, logData )
 	end if
 	touchpointHit = returnHtml
